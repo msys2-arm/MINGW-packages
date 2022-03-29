@@ -19,8 +19,9 @@ jobs:
           { msystem: CLANG64, runner: windows-2025 },
           { msystem: MINGW64, runner: windows-2025 },
           { msystem: MINGW32, runner: windows-2025 },
-          # { msystem: CLANGARM64, runner: ['Windows', 'ARM64', 'CI'] }
+          { msystem: CLANGARM64, runner: ['Windows', 'ARM64', 'CI'] }
         ]
+    timeout-minutes: 4320
     name: ${{ matrix.msystem }}
     runs-on: ${{ matrix.runner }}
     steps:
