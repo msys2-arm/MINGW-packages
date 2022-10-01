@@ -27,10 +27,16 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake"
              "${MINGW_PACKAGE_PREFIX}-autotools"
              $([[ "$_bootstrapping" == "no" ]] && echo "${MINGW_PACKAGE_PREFIX}-rust")
              "${MINGW_PACKAGE_PREFIX}-zlib"
-             "mingw-w64-clang-x86_64-clang"
-             "mingw-w64-clang-x86_64-libc++"
-             "mingw-w64-clang-x86_64-gcc-compat"
+             "${MINGW_PACKAGE_PREFIX}-cross-clang-x86_64"
+             "mingw-w64-clang-x86_64-curl"
+             "mingw-w64-clang-x86_64-libffi"
+             "mingw-w64-clang-x86_64-libssh2"
+             "mingw-w64-clang-x86_64-llvm"
+             "mingw-w64-clang-x86_64-openssl"
+             "mingw-w64-clang-x86_64-zlib"
              "git")
+
+
 options=('staticlibs' 'strip')
 #install=rust.install
 noextract=(${_realname}c-${pkgver}-src.tar.gz)
@@ -109,10 +115,11 @@ build() {
   if [[ $MINGW_PACKAGE_PREFIX == *-clang-aarch64 ]]; then
     BUILD="x86_64-pc-windows-gnu"
     HOST="$CARCH-pc-windows-gnullvm"
-    export PATH="/clang64/bin:${PATH}"
-    _rust_conf+=("--set target.${BUILD}.cc=/clang64/bin/clang.exe"
-      "--set target.${BUILD}.cxx=/clang64/bin/clang++.exe"
-      "--set target.${BUILD}.linker=/clang64/bin/clang.exe"
+    #export CFLAGS="-O2 -pipe"
+    #export CXXFLAGS="${CFLAGS}"
+    _rust_conf+=("--set target.${BUILD}.cc=${MINGW_PREFIX}/bin/x86_64-w64-mingw32-clang.exe"
+      "--set target.${BUILD}.cxx=${MINGW_PREFIX}/bin/x86_64-w64-mingw32-clang++.exe"
+      "--set target.${BUILD}.linker=${MINGW_PREFIX}/bin/x86_64-w64-mingw32-clang.exe"
       "--set target.${BUILD}.llvm-config=/clang64/bin/llvm-config.exe"
       "--set target.${HOST}.cc=${MINGW_PREFIX}/bin/clang.exe"
       "--set target.${HOST}.cxx=${MINGW_PREFIX}/bin/clang++.exe"
