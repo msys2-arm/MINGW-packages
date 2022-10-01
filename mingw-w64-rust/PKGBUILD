@@ -100,9 +100,15 @@ build() {
   if [[ $MINGW_PACKAGE_PREFIX == *-clang-* ]]; then
     export GCC_LIBS_HACK="$(cygpath -am build/missing-libs-hack)"
     mkdir -p "${GCC_LIBS_HACK}"
-    cp "$(cygpath -u $(clang -print-libgcc-file-name))" "${GCC_LIBS_HACK}/libgcc.a"
-    cp "${MINGW_PREFIX}/lib/libunwind.a" "${GCC_LIBS_HACK}/libgcc_eh.a"
-    cp "${MINGW_PREFIX}/lib/libunwind.dll.a" "${GCC_LIBS_HACK}/libgcc_s.a"
+    if [[ $MINGW_PACKAGE_PREFIX == *-aarch64 ]]; then
+      cp "$(cygpath -u $(x86_64-w64-mingw32-clang -print-libgcc-file-name))" "${GCC_LIBS_HACK}/libgcc.a"
+      cp "/clang64/lib/libunwind.a" "${GCC_LIBS_HACK}/libgcc_eh.a"
+      cp "/clang64/lib/libunwind.dll.a" "${GCC_LIBS_HACK}/libgcc_s.a"
+    else
+      cp "$(cygpath -u $(clang -print-libgcc-file-name))" "${GCC_LIBS_HACK}/libgcc.a"
+      cp "${MINGW_PREFIX}/lib/libunwind.a" "${GCC_LIBS_HACK}/libgcc_eh.a"
+      cp "${MINGW_PREFIX}/lib/libunwind.dll.a" "${GCC_LIBS_HACK}/libgcc_s.a"
+    fi
     export RUSTFLAGS_BOOTSTRAP="-C link-arg=-L$(cygpath -am build/missing-libs-hack)"
   fi
 
