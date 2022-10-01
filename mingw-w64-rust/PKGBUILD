@@ -75,7 +75,7 @@ prepare() {
     0005-win32-config.patch \
     0008-disable-self-contained.patch
 
-  if [[ $MINGW_PACKAGE_PREFIX == *-clang-x86_64 ]]; then
+  if [[ $MINGW_PACKAGE_PREFIX == *-clang-* ]]; then
     apply_patch_with_msg \
       0007-clang-subsystem.patch
   fi
@@ -91,7 +91,7 @@ build() {
   mkdir -p "${srcdir}/${MSYSTEM}" && cd "${srcdir}/${MSYSTEM}"
 
   # The ultimate hack to let the bootstrap compiler use libgcc* libs
-  if [[ $MINGW_PACKAGE_PREFIX == *-clang-x86_64 ]]; then
+  if [[ $MINGW_PACKAGE_PREFIX == *-clang-* ]]; then
     export GCC_LIBS_HACK="$(cygpath -am build/missing-libs-hack)"
     mkdir -p "${GCC_LIBS_HACK}"
     cp "$(cygpath -u $(clang -print-libgcc-file-name))" "${GCC_LIBS_HACK}/libgcc.a"
