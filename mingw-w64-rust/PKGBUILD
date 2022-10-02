@@ -6,13 +6,13 @@
 _realname=rust
 _bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
-pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
-         "${MINGW_PACKAGE_PREFIX}-rust-docs")
+pkgname=("mingw-w64-clang-aarch64-${_realname}"
+         "mingw-w64-clang-aarch64-rust-docs")
 pkgver=1.64.0
 pkgrel=1
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
-mingw_arch=('clangarm64')
+mingw_arch=('clang64')
 url="https://www.rust-lang.org/"
 license=('MIT' 'Apache')
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake"
@@ -27,16 +27,19 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake"
              "${MINGW_PACKAGE_PREFIX}-autotools"
              $([[ "$_bootstrapping" == "no" ]] && echo "${MINGW_PACKAGE_PREFIX}-rust")
              "${MINGW_PACKAGE_PREFIX}-zlib"
-             "${MINGW_PACKAGE_PREFIX}-cross-clang-x86_64"
-             "mingw-w64-clang-x86_64-curl"
-             "mingw-w64-clang-x86_64-libffi"
-             "mingw-w64-clang-x86_64-libssh2"
-             "mingw-w64-clang-x86_64-llvm"
-             "mingw-w64-clang-x86_64-openssl"
-             "mingw-w64-clang-x86_64-zlib"
+             "${MINGW_PACKAGE_PREFIX}-gcc-compat"
+	     "${MINGW_PACKAGE_PREFIX}-cross-clang-aarch64"
+             "mingw-w64-clang-aarch64-llvm"
+             "mingw-w64-clang-aarch64-curl"
+             "mingw-w64-clang-aarch64-libffi"
+             "mingw-w64-clang-aarch64-libssh2"
+             "mingw-w64-clang-aarch64-lldb"
+             "mingw-w64-clang-aarch64-llvm"
+             "mingw-w64-clang-aarch64-openssl"
+             "mingw-w64-clang-aarch64-python"
+             "mingw-w64-clang-aarch64-autotools"
+             "mingw-w64-clang-aarch64-zlib"
              "git")
-
-
 options=('staticlibs' 'strip')
 #install=rust.install
 noextract=(${_realname}c-${pkgver}-src.tar.gz)
@@ -81,12 +84,12 @@ prepare() {
     0005-win32-config.patch \
     0008-disable-self-contained.patch
 
-  if [[ $MINGW_PACKAGE_PREFIX == *-clang-* ]]; then
+  if [[ $MINGW_PACKAGE_PREFIX == *-clang-x86_64 ]]; then
     apply_patch_with_msg \
       0007-clang-subsystem.patch
   fi
 
-  if [[ $MINGW_PACKAGE_PREFIX == *-clang-aarch64 ]]; then
+  if [[ $MINGW_PACKAGE_PREFIX == *-clang-* ]]; then
     apply_patch_with_msg \
       0009-gnullvm-target.patch
   fi
@@ -100,15 +103,9 @@ build() {
   if [[ $MINGW_PACKAGE_PREFIX == *-clang-* ]]; then
     export GCC_LIBS_HACK="$(cygpath -am build/missing-libs-hack)"
     mkdir -p "${GCC_LIBS_HACK}"
-    if [[ $MINGW_PACKAGE_PREFIX == *-aarch64 ]]; then
-      cp "$(cygpath -u $(x86_64-w64-mingw32-clang -print-libgcc-file-name))" "${GCC_LIBS_HACK}/libgcc.a"
-      cp "/clang64/lib/libunwind.a" "${GCC_LIBS_HACK}/libgcc_eh.a"
-      cp "/clang64/lib/libunwind.dll.a" "${GCC_LIBS_HACK}/libgcc_s.a"
-    else
-      cp "$(cygpath -u $(clang -print-libgcc-file-name))" "${GCC_LIBS_HACK}/libgcc.a"
-      cp "${MINGW_PREFIX}/lib/libunwind.a" "${GCC_LIBS_HACK}/libgcc_eh.a"
-      cp "${MINGW_PREFIX}/lib/libunwind.dll.a" "${GCC_LIBS_HACK}/libgcc_s.a"
-    fi
+    cp "$(cygpath -u $(clang -print-libgcc-file-name))" "${GCC_LIBS_HACK}/libgcc.a"
+    cp "${MINGW_PREFIX}/lib/libunwind.a" "${GCC_LIBS_HACK}/libgcc_eh.a"
+    cp "${MINGW_PREFIX}/lib/libunwind.dll.a" "${GCC_LIBS_HACK}/libgcc_s.a"
     export RUSTFLAGS_BOOTSTRAP="-C link-arg=-L$(cygpath -am build/missing-libs-hack)"
   fi
 
@@ -118,19 +115,19 @@ build() {
   fi
 
   # Cross compile to gnullvm host
-  if [[ $MINGW_PACKAGE_PREFIX == *-clang-aarch64 ]]; then
+  if [[ $MINGW_PACKAGE_PREFIX == *-clang-x86_64 ]]; then
     BUILD="x86_64-pc-windows-gnu"
-    HOST="$CARCH-pc-windows-gnullvm"
-    #export CFLAGS="-O2 -pipe"
-    #export CXXFLAGS="${CFLAGS}"
-    _rust_conf+=("--set target.${BUILD}.cc=${MINGW_PREFIX}/bin/x86_64-w64-mingw32-clang.exe"
-      "--set target.${BUILD}.cxx=${MINGW_PREFIX}/bin/x86_64-w64-mingw32-clang++.exe"
-      "--set target.${BUILD}.linker=${MINGW_PREFIX}/bin/x86_64-w64-mingw32-clang.exe"
-      "--set target.${BUILD}.llvm-config=/clang64/bin/llvm-config.exe"
-      "--set target.${HOST}.cc=${MINGW_PREFIX}/bin/clang.exe"
-      "--set target.${HOST}.cxx=${MINGW_PREFIX}/bin/clang++.exe"
-      "--set target.${HOST}.linker=${MINGW_PREFIX}/bin/clang.exe"
-      "--set target.${HOST}.llvm-config=${MINGW_PREFIX}/bin/llvm-config.exe"
+    HOST="aarch64-pc-windows-gnullvm"
+    export CFLAGS="-O2 -pipe"
+    export CXXFLAGS="${CFLAGS}"
+    _rust_conf+=("--set target.${BUILD}.cc=${MINGW_PREFIX}/bin/clang.exe"
+      "--set target.${BUILD}.cxx=${MINGW_PREFIX}/bin/clang++.exe"
+      "--set target.${BUILD}.linker=${MINGW_PREFIX}/bin/clang.exe"
+      "--set target.${BUILD}.llvm-config=${MINGW_PREFIX}/bin/llvm-config.exe"
+      "--set target.${HOST}.cc=${MINGW_PREFIX}/bin/aarch64-w64-mingw32-clang.exe"
+      "--set target.${HOST}.cxx=${MINGW_PREFIX}/bin/aarch64-w64-mingw32-clang++.exe"
+      "--set target.${HOST}.linker=${MINGW_PREFIX}/bin/aarch64-w64-mingw32-clang.exe"
+      "--set target.${HOST}.llvm-config=/clangarm64/bin/llvm-config.exe"
       "--tools=cargo,clippy,rustfmt,src"
     )
   else
@@ -146,9 +143,9 @@ build() {
 
   MSYS2_ARG_CONV_EXCL="--prefix;--sysconfdir;--localstatedir" \
   ../${_realname}c-${pkgver}-src/configure \
-    --prefix=${MINGW_PREFIX} \
-    --sysconfdir=${MINGW_PREFIX}/etc \
-    --localstatedir=${MINGW_PREFIX}/var/lib \
+    --prefix=/clangarm64 \
+    --sysconfdir=/clangarm64/etc \
+    --localstatedir=/clangarm64/var/lib \
     --build=$BUILD \
     --host=$HOST \
     --target=$HOST \
@@ -158,29 +155,29 @@ build() {
     --enable-extended \
     --disable-llvm-static-stdcpp \
     --disable-codegen-tests \
-    --llvm-root=${MINGW_PREFIX} \
+    --llvm-root=/clangarm64 \
     --python=${MINGW_PREFIX}/bin/python \
     --set target.${BUILD}.linker="${CC}" \
     ${_rust_conf[@]}
 
-  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
-  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
-  DEP_Z_ROOT=${MINGW_PREFIX} \
+  DEP_NGHTTP_ROOT=/clangarm64 \
+  DEP_OPENSSL_ROOT=/clangarm64 \
+  DEP_Z_ROOT=/clangarm64 \
   ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build
 
   # create the install at a temporary directory
-  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
-  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
-  DEP_Z_ROOT=${MINGW_PREFIX} \
+  DEP_NGHTTP_ROOT=/clangarm64 \
+  DEP_OPENSSL_ROOT=/clangarm64 \
+  DEP_Z_ROOT=/clangarm64 \
   DESTDIR="$PWD"/dest-rust ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install
 
   # move docs out of the way for splitting
-  mv dest-rust/${MINGW_PREFIX}/share/doc dest-doc
+  mv dest-rust/clangarm64/share/doc dest-doc
 
-  rm -f dest-rust/${MINGW_PREFIX}/bin/libgcc*.dll
-  rm -f dest-rust/${MINGW_PREFIX}/bin/libstd*.dll
-  rm -f dest-rust/${MINGW_PREFIX}/bin/libwinpthread*.dll
-  rm -f dest-rust/${MINGW_PREFIX}/lib/rustlib/$HOST/lib/self-contained/*
+  rm -f dest-rust/clangarm64/bin/libgcc*.dll
+  rm -f dest-rust/clangarm64/bin/libstd*.dll
+  rm -f dest-rust/clangarm64/bin/libwinpthread*.dll
+  rm -f dest-rust/clangarm64/lib/rustlib/$HOST/lib/self-contained/*
 }
 
 check() {
@@ -196,37 +193,37 @@ check() {
 
 
 package_rust() {
-  depends=("${MINGW_PACKAGE_PREFIX}-cc"
-           "${MINGW_PACKAGE_PREFIX}-curl"
-           "${MINGW_PACKAGE_PREFIX}-libxml2"
-           "${MINGW_PACKAGE_PREFIX}-libssh2")
+  depends=("mingw-w64-clang-aarch64-cc"
+           "mingw-w64-clang-aarch64-curl"
+           "mingw-w64-clang-aarch64-libxml2"
+           "mingw-w64-clang-aarch64-libssh2")
 
   cd "${srcdir}/${MSYSTEM}"
 
   cp -a dest-rust/* "$pkgdir"
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-APACHE "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-APACHE"
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-MIT "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-MIT"
+  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-APACHE "${pkgdir}/clangarm64/share/licenses/${_realname}/LICENSE-APACHE"
+  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-MIT "${pkgdir}/clangarm64/share/licenses/${_realname}/LICENSE-MIT"
 
   # delete unnecessary files, e.g. components and manifest files only used for the uninstall script
-  cd "$pkgdir"/${MINGW_PREFIX}/lib/rustlib
+  cd "$pkgdir"/clangarm64/lib/rustlib
   rm components install.log manifest-* rust-installer-version uninstall.sh
 
-  install -d "$pkgdir/${MINGW_PREFIX}/share/bash-completion/completions"
-  mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" \
-     "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
+  install -d "$pkgdir/clangarm64/share/bash-completion/completions"
+  mv "${pkgdir}/clangarm64/etc/bash_completion.d/cargo" \
+     "${pkgdir}/clangarm64/share/bash-completion/completions/cargo"
 
 }
 
 package_rust-docs() {
   pkgdesc='Documentation for the Rust programming language'
-  conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}<1.52.0")
+  conflicts=("mingw-w64-clang-aarch64-${_realname}<1.52.0")
 
   cd "${srcdir}/${MSYSTEM}"
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-APACHE "${pkgdir}${MINGW_PREFIX}/share/licenses/$pkgname/LICENSE-APACHE"
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-MIT "${pkgdir}${MINGW_PREFIX}/share/licenses/$pkgname/LICENSE-MIT"
+  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-APACHE "${pkgdir}/clangarm64/share/licenses/$pkgname/LICENSE-APACHE"
+  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-MIT "${pkgdir}/clangarm64/share/licenses/$pkgname/LICENSE-MIT"
 
-  install -d "$pkgdir"/${MINGW_PREFIX}/share/
-  cp -a dest-doc "$pkgdir"/${MINGW_PREFIX}/share/doc
+  install -d "$pkgdir"/clangarm64/share/
+  cp -a dest-doc "$pkgdir"/clangarm64/share/doc
 }
 
 # template start; name=mingw-w64-splitpkg-wrappers; version=1.0;
@@ -234,7 +231,7 @@ package_rust-docs() {
 
 # generate wrappers
 for _name in "${pkgname[@]}"; do
-  _short="package_${_name#${MINGW_PACKAGE_PREFIX}-}"
+  _short="package_${_name#mingw-w64-clang-aarch64-}"
   _func="$(declare -f "${_short}")"
   eval "${_func/#${_short}/package_${_name}}"
 done
