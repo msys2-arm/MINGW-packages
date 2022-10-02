@@ -15,15 +15,15 @@ index 6b2146ad3ed..1f908a85046 100644
   "cc",
  ]
 @@ -4596,9 +4596,9 @@ dependencies = [
- 
+
  [[package]]
  name = "snapbox-macros"
--version = "0.3.0"
+-version = "0.2.1"
 +version = "0.3.1"
  source = "registry+https://github.com/rust-lang/crates.io-index"
--checksum = "8a253e6f894cfa440cba00600a249fa90869d8e0ec45ab274a456e043a0ce8f2"
+-checksum = "c01dea7e04cbb27ef4c86e9922184608185f7cd95c1763bc30d727cda4a5e930"
 +checksum = "485e65c1203eb37244465e857d15a26d3a85a5410648ccb53b18bd44cb3a7336"
- 
+
  [[package]]
  name = "socket2"
 @@ -4618,9 +4618,9 @@ checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
