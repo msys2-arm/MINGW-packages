@@ -49,7 +49,8 @@ source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.gz"{,
         "0005-win32-config.patch"
         "0007-clang-subsystem.patch"
         "0008-disable-self-contained.patch"
-        "0009-gnullvm-target.patch")
+        "0009-gnullvm-target.patch"
+        "rust-1.63.0.patch")
 sha256sums=('b3cd9f481e1a2901bf6f3808d30c69cc4ea80d93c4cc4e2ed52258b180381205'
             'SKIP'
             '7cb1773c288ffb1c1e751edc49b1890c84bf9c362742bc5225d19d474edb73a0'
@@ -57,7 +58,8 @@ sha256sums=('b3cd9f481e1a2901bf6f3808d30c69cc4ea80d93c4cc4e2ed52258b180381205'
             'c4e5ffeef84296d39c3e3e8f807fc8b33ce786b1e4edb21eef26b053586aca27'
             'c38450682a48bb1d5a0ddaa37ae5b324d39a9e0626daa2fc695caec1a53d6c35'
             '29f84cb8e05ce304e102e28912a3b4464add406a8ec37a6c6d717b9b7d81b67b'
-            '03073682837e628eb4d5bfb74c03f6c9d4ad25022ac214f9253a53f132f3084f')
+            '03073682837e628eb4d5bfb74c03f6c9d4ad25022ac214f9253a53f132f3084f'
+            'b44c2b48c9edb1095a8f7dd6c6f29c7fc6fefd2011d74d4faf4280407530b058')
 validpgpkeys=('108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE'  # Rust Language (Tag and Release Signing Key) <rust-key@rust-lang.org>
               '474E22316ABF4785A88C6E8EA2C794A986419D8A'  # Tom Stellard <tstellar@redhat.com>
               'B6C8F98282B944E3B0D5C2530FC3042E345AD05D') # Hans Wennborg <hans@chromium.org>
@@ -91,7 +93,8 @@ prepare() {
 
   if [[ $MINGW_PACKAGE_PREFIX == *-clang-* ]]; then
     apply_patch_with_msg \
-      0009-gnullvm-target.patch
+      0009-gnullvm-target.patch \
+      rust-1.63.0.patch
   fi
 }
 

@@ -1,0 +1,72 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 6b2146ad3ed..1f908a85046 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -2756,9 +2756,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "psm"
+-version = "0.1.16"
++version = "0.1.21"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "cd136ff4382c4753fc061cb9e4712ab2af263376b95bbd5bd8cd50c020b78e69"
++checksum = "5787f7cda34e3033a72192c018bc5883100330f362ef279a8cbccfce8bb4e874"
+ dependencies = [
+  "cc",
+ ]
+@@ -4596,9 +4596,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "snapbox-macros"
+-version = "0.3.0"
++version = "0.3.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "8a253e6f894cfa440cba00600a249fa90869d8e0ec45ab274a456e043a0ce8f2"
++checksum = "485e65c1203eb37244465e857d15a26d3a85a5410648ccb53b18bd44cb3a7336"
+ 
+ [[package]]
+ name = "socket2"
+@@ -4618,9 +4618,9 @@ checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
+ 
+ [[package]]
+ name = "stacker"
+-version = "0.1.14"
++version = "0.1.15"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "90939d5171a4420b3ff5fbc8954d641e7377335454c259dcb80786f3f21dc9b4"
++checksum = "c886bd4480155fd3ef527d45e9ac8dd7118a898a46530b7b94c3e21866259fce"
+ dependencies = [
+  "cc",
+  "cfg-if 1.0.0",
+diff --git a/compiler/rustc_llvm/build.rs b/compiler/rustc_llvm/build.rs
+index 28e092c1eb7..b4b26fb23cc 100644
+--- a/compiler/rustc_llvm/build.rs
++++ b/compiler/rustc_llvm/build.rs
+@@ -10,7 +10,6 @@
+     "aarch64",
+     "amdgpu",
+     "avr",
+-    "m68k",
+     "mips",
+     "powerpc",
+     "systemz",
+diff --git a/compiler/rustc_llvm/src/lib.rs b/compiler/rustc_llvm/src/lib.rs
+index 8542dcf5bf0..888cd0a6430 100644
+--- a/compiler/rustc_llvm/src/lib.rs
++++ b/compiler/rustc_llvm/src/lib.rs
+@@ -94,14 +94,6 @@ fn init() { }
+         LLVMInitializeAVRAsmPrinter,
+         LLVMInitializeAVRAsmParser
+     );
+-    init_target!(
+-        llvm_component = "m68k",
+-        LLVMInitializeM68kTargetInfo,
+-        LLVMInitializeM68kTarget,
+-        LLVMInitializeM68kTargetMC,
+-        LLVMInitializeM68kAsmPrinter,
+-        LLVMInitializeM68kAsmParser
+-    );
+     init_target!(
+         llvm_component = "mips",
+         LLVMInitializeMipsTargetInfo,
+
