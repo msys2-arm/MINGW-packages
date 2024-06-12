@@ -48,8 +48,6 @@ checkdepends=($([[ ${MINGW_PACKAGE_PREFIX} != *-clang-* ]] || echo "${MINGW_PACK
 source=("${rust_dist_server}/${_realname}c-${pkgver}-src.tar.gz"{,.asc}
         "${embed_manifest_url}"
         "https://github.com/rust-lang/rust/commit/eac0b3a1d1b8d1db8fa95c50e118de5b9471e5af.patch"
-        "https://github.com/rust-lang/backtrace-rs/commit/adc9f5ca6205a7bde95b5f1a3f029e590ce6c694.patch"
-        "https://github.com/rust-lang/backtrace-rs/commit/e15130618237eb3e2d4b622549f9647b4c1d9ca3.patch"
         "0001-rustc-llvm-fix-libs.patch"
         "0005-win32-config.patch"
         "0007-clang-subsystem.patch"
@@ -61,8 +59,6 @@ sha256sums=('172ecf3c7d1f9d9fb16cd2a628869782670416ded0129e524a86751f961448c0'
             'SKIP'
             '24ef6d949c0b5b1940c1d6a7aad78d86012152fb8845a1644bc939350d7b75e2'
             'd9a1ac6343c3d5428691701aba2489858cca069510da319ceca9c7bf7ed0ca0d'
-            '8b6a5f1ede0a73f4aa5cf9c4b0e48f4db9885717dfc2c953d190a17e13ae5bbb'
-            '084e950c0441dd649624692250ee6e771d796467e85feac5b6cd6aee2a862ce2'
             '7cb1773c288ffb1c1e751edc49b1890c84bf9c362742bc5225d19d474edb73a0'
             '7d1c4e49524b835a8eadc961b39f5594b12a522a1e24368999be2c7e85399e4e'
             '46b63be79e4f2d5da2b183ed963429bce22966227bf24a73b158d23875841b11'
@@ -132,12 +128,6 @@ prepare() {
   if [[ $MSYSTEM == MINGW* ]]; then
     apply_patch_with_msg \
       eac0b3a1d1b8d1db8fa95c50e118de5b9471e5af.patch
-  fi
-  if [[ $MINGW_PACKAGE_PREFIX == *-aarch64 ]]; then
-    (cd library/backtrace && \
-      apply_patch_with_msg \
-        adc9f5ca6205a7bde95b5f1a3f029e590ce6c694.patch \
-        e15130618237eb3e2d4b622549f9647b4c1d9ca3.patch)
   fi
 }
 
