@@ -1,0 +1,32 @@
+From c7c1a322ea7f2396ff04ca63bae986d0bd5bd1d5 Mon Sep 17 00:00:00 2001
+From: Jeremy Drake <jeremyd2019@users.sourceforge.net>
+Date: Mon, 30 Dec 2024 10:37:29 -0800
+Subject: [PATCH] headers: undef register in case projects define it
+
+For example, doxygen defines `register` to shut up an error due to it being
+deprecated/removed in ISO C++ 17, but that causes issues with this
+construct, which is an extension and still supported.
+
+Fixes: f0044963d7ba ("headers: Use register variable for NtCurrentTeb implementation on aarch64.")
+---
+ mingw-w64-headers/include/winnt.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/mingw-w64-headers/include/winnt.h b/mingw-w64-headers/include/winnt.h
+index b6d1f58ed..e6fdfac51 100644
+--- a/mingw-w64-headers/include/winnt.h
++++ b/mingw-w64-headers/include/winnt.h
+@@ -10211,7 +10211,10 @@ typedef DWORD (WINAPI *PRTL_RUN_ONCE_INIT_FN)(PRTL_RUN_ONCE, PVOID, PVOID *);
+     PVOID GetFiberData(VOID);
+ 
+ #if defined (__aarch64__) || defined(__arm64ec__)
++#pragma push_macro ("register")
++#undef register
+     register struct _TEB *__mingw_current_teb __asm__("x18");
++#pragma pop_macro ("register")
+     FORCEINLINE struct _TEB *NtCurrentTeb(VOID)
+     {
+         return __mingw_current_teb;
+-- 
+2.47.1.windows.1
+
