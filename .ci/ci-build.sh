@@ -136,7 +136,7 @@ for package in "${packages[@]}"; do
     execute 'Fetch keys' "$DIR/fetch-validpgpkeys.sh"
     cp -r ${package} B && cd B
     message 'Building binary'
-    makepkg-mingw --noconfirm --noprogressbar --nocheck --syncdeps --rmdeps --cleanbuild || failure "${status} failed"
+    makepkg-mingw --noconfirm --noprogressbar --syncdeps --rmdeps --cleanbuild || failure "${status} failed"
     cd - > /dev/null
     repo-add $PWD/artifacts/ci.db.tar.gz $PWD/B/*.pkg.tar.*
     pacman -Sy
